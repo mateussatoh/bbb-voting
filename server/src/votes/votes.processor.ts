@@ -16,7 +16,7 @@ export class VotesProcessor extends WorkerHost {
     const redis = this.redisService.getClient();
 
     const { candidateId } = job.data as { candidateId: string };
-    await redis.incr(`votes:${candidateId}`);
+    await redis.hincrby('votes', candidateId, 1);
 
     console.log(`✅ Voto registrado para ${candidateId}`);
   }

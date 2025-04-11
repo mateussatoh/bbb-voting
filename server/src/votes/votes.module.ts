@@ -6,7 +6,7 @@ import { VotesProcessor } from './votes.processor';
 import { RedisModule } from 'src/redis/redis.module';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-
+import { VotesGateway } from './votes.gateway';
 @Module({
   imports: [
     BullModule.registerQueue({
@@ -18,7 +18,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
     }),
     RedisModule,
   ],
-  providers: [VotesService, VotesProcessor],
+  providers: [VotesService, VotesProcessor, VotesGateway],
   controllers: [VotesController],
 })
 export class VotesModule {}
