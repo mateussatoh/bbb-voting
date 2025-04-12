@@ -24,8 +24,12 @@ export class VotesService {
   }
 
   async enqueueVote(candidateId: string) {
-    await this.voteQueue.add('register-vote', { candidateId });
+    await this.voteQueue.add(
+      'register-vote',
+      { candidateId },
+      // { removeOnComplete: true },
+    );
 
-    return { message: 'Voto enfileirado com sucesso!' };
+    return;
   }
 }

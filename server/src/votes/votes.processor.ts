@@ -12,12 +12,9 @@ export class VotesProcessor extends WorkerHost {
   }
 
   async process(job: Job): Promise<void> {
-    console.log('🔥 Processando job', job.id, 'com dados:', job.data);
     const redis = this.redisService.getClient();
 
     const { candidateId } = job.data as { candidateId: string };
     await redis.hincrby('votes', candidateId, 1);
-
-    console.log(`✅ Voto registrado para ${candidateId}`);
   }
 }
