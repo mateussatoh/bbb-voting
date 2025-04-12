@@ -1,6 +1,6 @@
 "use client";
 
-import { Pie, PieChart } from "recharts";
+import { Cell, Pie, PieChart } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,42 +9,80 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--chart-1)" },
-  { browser: "safari", visitors: 200, fill: "var(--chart-2)" },
-  { browser: "firefox", visitors: 187, fill: "var(--chart-3)" },
-];
+import { CandidateVotes } from "@/App";
 
 const chartConfig = {
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
+  votes: {
+    label: "Votos",
   },
 } satisfies ChartConfig;
 
-export function PieGraphCard() {
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f50",
+  "#a4de6c",
+  "#d0ed57",
+  "#8dd1e1",
+];
+
+const RADIAN = Math.PI / 180;
+
+export function PieGraphCard({ data }: { data: CandidateVotes[] }) {
+  const renderCustomizedLabel = (props: any) => {
+    const radius =
+      props.innerRadius + (props.outerRadius - props.innerRadius) * 0.5;
+    const x = props.cx + radius * Math.cos(-props.midAngle * RADIAN);
+    const y = props.cy + radius * Math.sin(-props.midAngle * RADIAN);
+
+    const candidateData = data[props.index];
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="20"
+        className="font-bold"
+      >
+        {`${candidateData.candidateId} - ${(props.percent * 100).toFixed(0)}%`}
+      </text>
+    );
+  };
+
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+    <Card>
+      <CardHeader>
         <CardTitle>Votos totais - Gráfico pizza</CardTitle>
-        {/* <CardDescription>January - June 2024</CardDescription> */}
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+          className="[&_.recharts-pie-label-text]:fill-foreground"
         >
           <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} dataKey="visitors" label nameKey="browser" />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Pie
+              data={data}
+              dataKey="votes"
+              label={renderCustomizedLabel}
+              nameKey="candidateId"
+              outerRadius={150}
+              labelLine={false}
+            >
+              {data.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
           </PieChart>
         </ChartContainer>
       </CardContent>

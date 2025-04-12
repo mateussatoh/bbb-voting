@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Cell, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -9,44 +9,64 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const chartData = [
-  { month: "Prior", votes: 186 },
-  { month: "Jean Wyllys", votes: 305 },
-  { month: "Bambam", votes: 237 },
-];
+import { CandidateVotes } from "@/App";
 
 const chartConfig = {
   votes: {
     label: "Votos",
-    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 
-export function HorizontalBarGraphCard() {
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f50",
+  "#a4de6c",
+  "#d0ed57",
+  "#8dd1e1",
+];
+
+export function HorizontalBarGraphCard({ data }: { data: CandidateVotes[] }) {
+  function renderCustomizedLabel(props: any) {
+    const { x, y, width, height, value, index } = props;
+
+    const candidateData = data[index];
+
+    return (
+      <text
+        x={x + width / 2}
+        y={y + height / 2}
+        fill="#fff"
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize="30"
+        className="font-bold"
+      >
+        {candidateData.candidateId}: {value}
+      </text>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Votos totais - Grafico barras</CardTitle>
-        {/* <CardDescription>January - June 2024</CardDescription> */}
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData} layout="vertical">
+          <BarChart accessibilityLayer data={data} layout="vertical">
             <XAxis type="number" dataKey="votes" />
-            <YAxis
-              dataKey="month"
-              type="category"
-              // tickLine={true}
-              // tickMargin={0}
-              // axisLine={true}
-              // tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar dataKey="votes" fill="var(--chart-1)" radius={4} />
+            <YAxis dataKey="candidateId" type="category" hide />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <Bar dataKey="votes" radius={4} label={renderCustomizedLabel}>
+              {data.map((_, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>
